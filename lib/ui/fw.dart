@@ -8,6 +8,19 @@ class FW extends StatefulWidget {
 class _FWState extends State<FW> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter Weather'),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => debugPrint("Hey"),
+            color: Colors.white,
+          )
+        ],
+      ),
+    );
   }
 }
