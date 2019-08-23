@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -28,7 +29,7 @@ class _FWState extends State<FW> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.location_on),
-              onPressed: () => debugPrint("Hey"),
+              onPressed: () => getAll(),
               color: Colors.white,
             )
           ],
@@ -67,6 +68,30 @@ class _FWState extends State<FW> {
     return json.decode(response.body);
   }
 
+  Future<Position> getLocation() async {
+    Geolocator geolocator = Geolocator();
+    Position userLocation;
+    userLocation = await geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.best);
+    return userLocation;
+  }
+
+  Future<Map> getAll() async {
+    // Get user position and set to lat, long values
+    Position user = await getLocation();
+    double lat = user.latitude;
+    double long = user.longitude;
+
+    // Get the name of the location
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(lat, long);
+
+    // Get the weather, and add the name of the location
+    Map weather = await getWeather(lat, long);
+    weather['name'] = placemark[0].name.toString();
+    debugPrint(weather['name']);
+    return weather;
+  }
+
   Widget updateTempWidget(double lat, double long) {
     return FutureBuilder(
       future: getWeather(lat, long),
@@ -77,7 +102,7 @@ class _FWState extends State<FW> {
               "${content['currently']['temperature'].toString()}\u00b0C",
               style: weatherStyle());
         }
-        return null;
+        return Container(width: 0.0, height: 0.0,);
       },
     );
   }
